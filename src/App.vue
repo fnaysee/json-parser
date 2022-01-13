@@ -1,15 +1,15 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-
+    <parser></parser>
   </div>
 </template>
 
 <script>
+import Parser from "@/components/Parser";
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    Parser
   }
 }
 </script>
