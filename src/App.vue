@@ -15,8 +15,12 @@
       <parser></parser>
     </v-main>
 
-    <v-footer absolute>
-      jh
+    <v-footer
+        absolute
+
+        class="justify-center"
+        style="text-align: center; color: #888888; font-size: 68.8%">
+      Made by <v-icon  class="px-1 blinking-heart" size="12">mdi-heart</v-icon>  Farhan
     </v-footer>
   </v-app>
 </template>
@@ -36,3 +40,39 @@ export default {
   }),
 };
 </script>
+
+<style lang="scss">
+.blinking-heart {
+  &:hover {
+    &:before{
+      color: red !important;
+      transform: scale(2);
+      animation-name: bounce;
+
+      -webkit-animation-duration: .7s;
+      animation-duration: .7s;
+      -webkit-animation-fill-mode: both;
+      animation-fill-mode: both;
+      -webkit-animation-timing-function: linear;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      -webkit-animation-iteration-count: infinite;
+    }
+  }
+}
+
+@keyframes bounce {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.2);
+  }
+  70% {
+    transform: scale(.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+</style>
