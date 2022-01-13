@@ -1,4 +1,4 @@
-# json-parser
+# JSON Parser
 JSON string parser
 
 Deeply parses the JSON string and understands and parses inner JSON strings
