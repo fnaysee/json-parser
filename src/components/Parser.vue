@@ -47,13 +47,19 @@
 
           </v-menu>
         </v-card-title>
+<!--        <template v-if="resultType === 'HTML'">-->
+<!--          <pre-->
+<!--              v-if="parsedResult"-->
+
+<!--              v-html="parsedResult"-->
+<!--              style=""-->
+
+<!--              class="html parsed-code-box"></pre>-->
+<!--        </template>-->
         <template v-if="resultType === 'HTML'">
-          <pre
-              v-if="parsedResult"
-
-              v-html="parsedResult"
-
-              class="html"></pre>
+          <div v-if="parsedResult" class="parsed-code-box">
+            <json-viewer :data="parsedResult" />
+          </div>
         </template>
         <template v-else-if="resultType === 'String'">
           <div
@@ -67,8 +73,11 @@
 </template>
 
 <script>
+import JsonViewer from "@/components/JsonViewer.vue";
+
 export default {
   name: "Parser",
+  components: {JsonViewer},
   data : ()=>({
     inputString: null,
     parsedResult: null,
@@ -109,16 +118,27 @@ export default {
         return false
       }
     },
-    showData(){
-       switch (this.resultType){
-         case 'HTML':
-           this.parsedResult = this.inputString ? this.syntaxHighlight(JSON.stringify(this.analyse(this.inputString), null, 4)) : null
-           break;
-         case 'String':
-           this.parsedResult = this.inputString ? JSON.stringify(this.analyse(this.inputString), null, 4) : null
-
-           break;
-       }
+    // showData(){
+    //    switch (this.resultType){
+    //      case 'HTML':
+    //        this.parsedResult = this.inputString ? this.syntaxHighlight(JSON.stringify(this.analyse(this.inputString), null, 4)) : null
+    //        break;
+    //      case 'String':
+    //        this.parsedResult = this.inputString ? JSON.stringify(this.analyse(this.inputString), null, 4) : null
+    //
+    //        break;
+    //    }
+    // },
+    showData() {
+      const analysed = this.inputString ? this.analyse(this.inputString) : null;
+      switch (this.resultType) {
+        case 'HTML':
+          this.parsedResult = analysed;
+          break;
+        case 'String':
+          this.parsedResult = analysed ? JSON.stringify(analysed, null, 4) : null;
+          break;
+      }
     },
     syntaxHighlight(json) {
       json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -158,4 +178,10 @@ pre {padding: 5px; overflow-x: auto }
 .boolean { color: blue; }
 .null { color: magenta; }
 .key { color: #0e2b5a; }
+
+.parsed-code-box {
+  overflow-x: auto;
+  margin-bottom: 50px;
+  max-height: 500px;
+}
 </style>
