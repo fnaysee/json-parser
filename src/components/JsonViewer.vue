@@ -1,40 +1,61 @@
 <template>
   <div class="json-viewer">
+    <!-- Object -->
     <template v-if="isObject">
       <div>
         <span @click="toggle" class="toggle">
           {{ collapsed ? '+' : '-' }}
         </span>
         <span class="bracket">{</span>
-        <span class="info-count"> {{ Object.keys(data).length }} keys</span>
-        <template v-show="!collapsed" class="children" v-if="!collapsed">
+        <span class="info-count">{{ Object.keys(data).length }} keys</span>
+
+        <!-- مهم: v-if برای lazy render -->
+        <div v-if="!collapsed" class="children">
           <div v-for="(value, key) in data" :key="key" class="child">
             <span class="key">"{{ key }}"</span><span>:</span>
-            <json-viewer :data="value" class="value-inline"/>
+            <json-viewer
+                :data="value"
+                :default-collapsed="true"
+                class="value-inline"
+            />
           </div>
-        </template>
+        </div>
+
         <span class="bracket">}</span>
       </div>
     </template>
 
+    <!-- Array -->
     <template v-else-if="isArray">
       <div>
         <span @click="toggle" class="toggle">
           {{ collapsed ? '+' : '-' }}
         </span>
         <span class="bracket">[</span>
-        <span class="info-count"> {{ data.length }} items</span>
-        <div v-show="!collapsed" class="children" v-if="!collapsed">
-          <div v-for="(value, key) in data" :key="key" class="child">
-            <div v-for="(value, index) in data" :key="index" class="child">
-              <json-viewer :data="value" class="value-inline"/>
-            </div>
+        <span class="info-count">{{ data.length }} items</span>
+
+        <!-- کنترل دکمه‌ها فقط وقتی بازه -->
+        <span class="controls" v-if="!collapsed">
+          <button @click="expandOneLevel">Expand 1 Level</button>
+        </span>
+
+        <!-- مهم: v-if برای destroy/restore بچه‌ها -->
+        <div v-if="!collapsed" class="children">
+          <div v-for="(value, index) in data" :key="index" class="child">
+            <json-viewer
+                ref="children"
+                :data="value"
+                :default-collapsed="true"
+                class="value-inline"
+            />
           </div>
         </div>
+
         <span class="bracket">]</span>
       </div>
     </template>
 
+    <!-- Primitive -->
     <template v-else>
       <span :class="valueClass">{{ formatValue(data) }}</span>
     </template>
@@ -45,11 +66,21 @@
 export default {
   name: "JsonViewer",
   props: {
-    data: {type: [Object, Array, String, Number, Boolean, null], required: true}
+    data: {
+      type: [Object, Array, String, Number, Boolean, null],
+      required: true
+    },
+    // تعیین حالت پیش‌فرض باز/بسته برای هر نود
+    defaultCollapsed: {
+      type: Boolean,
+      default: true
+    }
   },
-  data: () => ({
-    collapsed: true
-  }),
+  data() {
+    return {
+      collapsed: this.defaultCollapsed
+    };
+  },
   computed: {
     isObject() {
       return this.data && typeof this.data === "object" && !Array.isArray(this.data);
@@ -73,6 +104,30 @@ export default {
       if (typeof value === "string") return `"${value}"`;
       if (value === null) return "null";
       return value;
+    },
+    // فقط یک لایه از فرزندان مستقیم آرایه را باز کن
+    expandOneLevel() {
+      if (this.$refs.children) {
+        this.$refs.children.forEach(child => {
+          if (child && (child.isObject || child.isArray)) {
+            child.collapsed = false; // فقط همین سطح
+          }
+        });
+      }
+    },
+    // همه‌چیز را درختی ببند (بازگشتی)
+    collapseAll() {
+      if (this.$refs.children) {
+        this.$refs.children.forEach(child => {
+          if (child && (child.isObject || child.isArray)) {
+            child.collapsed = true;
+            if (typeof child.collapseAll === "function") {
+              child.collapseAll();
+            }
+          }
+        });
+      }
+      this.collapsed = true;
     }
   }
 };
@@ -85,40 +140,18 @@ export default {
   line-height: 1.4;
 }
 
-.key {
-  color: #0e2b5a;
-  margin-right: 5px;
-}
+.key { color: #0e2b5a; margin-right: 5px; }
+.string { color: green; }
+.number { color: darkorange; }
+.boolean { color: blue; }
+.null { color: magenta; }
 
-.string {
-  color: green;
-}
-
-.number {
-  color: darkorange;
-}
-
-.boolean {
-  color: blue;
-}
-
-.null {
-  color: magenta;
-}
-
-.bracket {
-  font-weight: bold;
-}
-
-.info-count {
-  font-size: 12px;
-  color: #888;
-  margin-left: 4px;
-}
+.bracket { font-weight: bold; }
+.info-count { font-size: 12px; color: #888; margin-left: 4px; }
 
 .children {
-  padding-left: 10px; /* قبلاً 20px بود */
-  border-left: 1px dotted #ccc; /* راهنما برای درک تو رفتگی */
+  padding-left: 10px;
+  border-left: 1px dotted #ccc;
   margin-left: 4px;
 }
 
@@ -132,14 +165,15 @@ export default {
   margin: 2px 0;
   padding-left: 20px;
 }
-.child > .key {
-  margin-right: 5px;
-}
-.inline {
-  display: inline;
-}
+.child > .key { margin-right: 5px; }
 
-.value-inline {
-  display: inline;
+.value-inline { display: inline; }
+
+.controls { margin-left: 10px; }
+.controls button {
+  font-size: 11px;
+  margin-left: 4px;
+  padding: 0 4px;
+  cursor: pointer;
 }
 </style>
