@@ -5,7 +5,7 @@
       color="white"
 
     >
-      <img :src="'/favicon.png'" width="40" height="40" />
+      <img :src="'/json-parser/favicon.png'" width="40" height="40" />
       <v-app-bar-title>JSON Parser</v-app-bar-title>
       <v-spacer></v-spacer>
       <v-btn icon href="https://github.com/fnaysee/json-parser"><v-icon>mdi-github</v-icon></v-btn>
