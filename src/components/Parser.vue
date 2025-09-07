@@ -66,7 +66,7 @@
         <v-card-text class="parsed-wrapper flex-grow-1">
           <template v-if="resultType === 'HTML'">
             <div v-if="parsedResult" class="parsed-code-box">
-              <json-viewer :data="parsedResult" :is-root="true" />
+              <json-viewer :data="parsedResult"  />
             </div>
           </template>
 

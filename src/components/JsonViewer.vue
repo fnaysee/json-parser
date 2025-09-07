@@ -81,8 +81,11 @@ export default {
   },
   data() {
     return {
-      collapsed: this.isRoot ? false : this.defaultCollapsed
+      collapsed: true
     };
+  },
+  created() {
+    this.collapsed = this.initCollapsed();
   },
   computed: {
     isObject() {
@@ -100,6 +103,12 @@ export default {
     }
   },
   methods: {
+    initCollapsed() {
+      if (this.isRoot) return false;          // Root همیشه باز
+      if (this.isObject) return false;      // Object پیش‌فرض باز
+      if (this.isArray) return true;        // Array پیش‌فرض بسته
+      return this.defaultCollapsed;
+    },
     toggle() {
       this.collapsed = !this.collapsed;
     },
