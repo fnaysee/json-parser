@@ -58,7 +58,7 @@
 <!--        </template>-->
         <template v-if="resultType === 'HTML'">
           <div v-if="parsedResult" class="parsed-code-box">
-            <json-viewer :data="parsedResult" />
+            <json-viewer :data="parsedResult" :is-root="true" />
           </div>
         </template>
         <template v-else-if="resultType === 'String'">

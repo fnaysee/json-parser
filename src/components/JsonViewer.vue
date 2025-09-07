@@ -7,7 +7,7 @@
           {{ collapsed ? '+' : '-' }}
         </span>
         <span class="bracket">{</span>
-        <span class="info-count">{{ Object.keys(data).length }} keys</span>
+        <span class="info-count" @click="toggle">{{ Object.keys(data).length }} keys</span>
 
         <!-- مهم: v-if برای lazy render -->
         <div v-if="!collapsed" class="children">
@@ -32,7 +32,7 @@
           {{ collapsed ? '+' : '-' }}
         </span>
         <span class="bracket">[</span>
-        <span class="info-count">{{ data.length }} items</span>
+        <span @click="toggle" class="info-count">{{ data.length }} items</span>
 
         <!-- کنترل دکمه‌ها فقط وقتی بازه -->
         <span class="controls" v-if="!collapsed">
@@ -70,15 +70,18 @@ export default {
       type: [Object, Array, String, Number, Boolean, null],
       required: true
     },
-    // تعیین حالت پیش‌فرض باز/بسته برای هر نود
     defaultCollapsed: {
       type: Boolean,
       default: true
+    },
+    isRoot: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
     return {
-      collapsed: this.defaultCollapsed
+      collapsed: this.isRoot ? false : this.defaultCollapsed
     };
   },
   computed: {
@@ -105,17 +108,15 @@ export default {
       if (value === null) return "null";
       return value;
     },
-    // فقط یک لایه از فرزندان مستقیم آرایه را باز کن
     expandOneLevel() {
       if (this.$refs.children) {
         this.$refs.children.forEach(child => {
           if (child && (child.isObject || child.isArray)) {
-            child.collapsed = false; // فقط همین سطح
+            child.collapsed = false;
           }
         });
       }
     },
-    // همه‌چیز را درختی ببند (بازگشتی)
     collapseAll() {
       if (this.$refs.children) {
         this.$refs.children.forEach(child => {
