@@ -58,6 +58,13 @@
               >
                 <v-list-item-title>{{ item.title }}</v-list-item-title>
               </v-list-item>
+
+              <v-divider></v-divider>
+
+              <!-- آیتم کپی -->
+              <v-list-item @click="copyFormatted">
+                <v-list-item-title>📋 Copy formatted JSON</v-list-item-title>
+              </v-list-item>
             </v-list>
           </v-menu>
         </v-card-title>
@@ -66,7 +73,7 @@
         <v-card-text class="parsed-wrapper flex-grow-1">
           <template v-if="resultType === 'HTML'">
             <div v-if="parsedResult" class="parsed-code-box">
-              <json-viewer :data="parsedResult"  />
+              <json-viewer :data="parsedResult" />
             </div>
           </template>
 
@@ -135,6 +142,22 @@ export default {
               : null;
           break;
       }
+    },
+    copyFormatted() {
+      if (!this.parsedResult) return;
+
+      let text = "";
+      if (typeof this.parsedResult === "object") {
+        text = JSON.stringify(this.parsedResult, null, 4); // فرمت زیبا
+      } else {
+        text = String(this.parsedResult);
+      }
+
+      navigator.clipboard.writeText(text).then(() => {
+        this.$emit("notify", "Copied to clipboard!");
+      }).catch(err => {
+        console.error("Clipboard copy failed", err);
+      });
     },
   },
   watch: {
